@@ -157,7 +157,7 @@ export default function Chat() {
       });
 
       // 4. CHAMA O SEU SERVIDOR NODE.JS EM VEZ DA GROQ DIRETAMENTE!
-      const response = await fetch('http://localhost:5000/api/chat/ask', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chat/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: apiMessages })
