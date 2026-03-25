@@ -1,14 +1,49 @@
-import React, { useState } from 'react';  
-import { Link } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [erro, setErro] = useState(''); // Estado para exibir erros na tela
+  const [carregando, setCarregando] = useState(false); // Estado para o botão de login
+
+  // Trazendo a função login do nosso contexto e o hook de navegação
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    // Aqui faremos a chamada para o nosso Backend Node.js
-    console.log("Tentando logar com:", email, password);
+    setErro('');
+    setCarregando(true);
+
+    try {
+      // Fazendo a chamada para o nosso Backend Node.js
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Sucesso! Salvamos os dados no contexto (e localStorage)
+        // O Supabase retorna os dados do usuário dentro de data.session.user
+        login(data.session.user, data.session.access_token);
+        
+        // Redireciona para o Dashboard (que vai cair direto em /app/anotacoes)
+        navigate('/app');
+      } else {
+        // Se a API retornar erro (ex: senha incorreta)
+        setErro(data.error || 'Erro ao realizar login.');
+      }
+    } catch (error) {
+      console.error("Erro na requisição:", error);
+      setErro('Erro de conexão com o servidor das abelhas. 🐝');
+    } finally {
+      setCarregando(false);
+    }
   };
 
   return (
@@ -16,7 +51,6 @@ export default function Login() {
       
       {/* Logo e Título */}
       <div className="mb-8 text-center flex flex-col items-center">
-        {/* Substitua por um <img> com sua logo de abelha real */}
         <div className="text-4xl mb-2">🐝</div> 
         <h1 className="text-3xl font-bold text-gray-800">Buzzer</h1>
       </div>
@@ -25,6 +59,13 @@ export default function Login() {
       <div className="bg-white p-8 rounded-lg shadow-sm w-full max-w-md border border-gray-200">
         <form onSubmit={handleLogin} className="space-y-6">
           
+          {/* Mensagem de Erro (se houver) */}
+          {erro && (
+            <div className="bg-red-100 text-red-700 p-3 rounded text-sm text-center">
+              {erro}
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1">Email</label>
             <input 
@@ -51,9 +92,10 @@ export default function Login() {
 
           <button 
             type="submit" 
-            className="w-full bg-[#EAAA40] hover:bg-[#d49630] text-white font-bold py-2 px-4 rounded transition duration-200"
+            disabled={carregando}
+            className={`w-full bg-[#EAAA40] hover:bg-[#d49630] text-white font-bold py-2 px-4 rounded transition duration-200 ${carregando ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Log in
+            {carregando ? 'Entrando...' : 'Log in'}
           </button>
 
           <div className="text-sm">
@@ -64,8 +106,7 @@ export default function Login() {
 
       {/* Link de Cadastro */}
       <div className="mt-6 text-sm text-gray-600">
-        Don't have an account? <Link to="/cadastro">Sign up</Link>
-        {/* Se usar React Router: <Link to="/cadastro" className="font-bold text-gray-800 hover:underline">Sign up</Link> */}
+        Don't have an account? <Link to="/cadastro" className="font-bold text-gray-800 hover:underline">Sign up</Link>
       </div>
 
     </div>

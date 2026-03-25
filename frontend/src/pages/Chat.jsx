@@ -134,10 +134,10 @@ export default function Chat() {
     setMessages(currentMessages);
 
     try {
-      // Salva no banco
+      // 1. Salva a mensagem do usuário no banco
       await supabase.from('chat_messages').insert([newUserMsg]);
 
-      // Renomeia sessão automaticamente
+      // 2. Renomeia sessão automaticamente (seu código original - mantido)
       const currentSession = sessions.find(s => s.id === activeSessionId);
       if (currentSession && currentSession.title === 'Nova Conversa') {
         const newTitle = userMessage.length > 25 ? userMessage.substring(0, 25) + '...' : userMessage;
@@ -145,7 +145,7 @@ export default function Chat() {
         setSessions(sessions.map(s => s.id === activeSessionId ? { ...s, title: newTitle } : s));
       }
 
-      // Prepara mensagens para a IA
+      // 3. Prepara mensagens para a IA
       const apiMessages = currentMessages.map(m => ({
         role: m.role,
         content: m.content
@@ -156,32 +156,21 @@ export default function Chat() {
         content: 'Você é o Buzzer AI, um assistente virtual altamente especializado em apicultura, manejo de colmeias e produção de mel. Responda sempre de forma clara, técnica, mas acessível. Use um tom prestativo e evite textos excessivamente longos se a pergunta for simples.' 
       });
 
-      // NOVO: Faz um print na consola para termos a certeza que o .env foi lido
-      console.log("A chave da API está a ser lida?:", import.meta.env.VITE_GROQ_API_KEY ? "SIM" : "NÃO");
-
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      // 4. CHAMA O SEU SERVIDOR NODE.JS EM VEZ DA GROQ DIRETAMENTE!
+      const response = await fetch('http://localhost:5000/api/chat/ask', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "llama-3.1-8b-instant", // Modelo atualizado e recomendado
-          messages: apiMessages,
-          temperature: 0.7
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: apiMessages })
       });
 
-      // NOVO: Captura o erro real devolvido pelos servidores da Groq
       if (!response.ok) {
-        const errData = await response.json();
-        console.error("Detalhe do erro da Groq:", errData);
-        throw new Error(`${errData.error?.message || response.statusText}`);
+        throw new Error('Falha ao conectar com o servidor Buzzer.');
       }
 
       const data = await response.json();
-      const aiResponseText = data.choices[0].message.content;
+      const aiResponseText = data.reply; // Pegamos a resposta mastigada do Node
 
+      // 5. Salva a resposta da IA no banco
       const newAiMsg = { 
         session_id: activeSessionId,
         role: 'assistant', 
@@ -196,18 +185,18 @@ export default function Chat() {
       if (error) throw error;
 
       setMessages((prev) => [...prev, aiData[0]]);
-      setIsLoading(false);
-
+      
     } catch (error) {
-      console.error('Erro na integração com a Groq:', error);
+      console.error('Erro no fluxo do chat:', error);
       
       const errorMsg = { 
         session_id: activeSessionId,
         role: 'assistant', 
-        content: `Erro ao comunicar com a IA: ${error.message}` 
+        content: `⚠️ Zumbido com erro: ${error.message}` 
       };
       setMessages((prev) => [...prev, { ...errorMsg, id: Date.now() }]);
-      setIsLoading(false);
+    } finally {
+      setIsLoading(false); // Movido para o finally para garantir que sempre execute
     }
   };
 
