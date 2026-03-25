@@ -24,8 +24,8 @@ export default function DashboardLayout() {
             {/* Logo area: Compactada (w-fit), Zero Laterais Sobrando e agora com CINZA CLARO */}
             {/* Fundo Cinza (bg-[##232429]) e Borda Cinza Média */}
             <div className="p-2 flex items-center gap-1 rounded-xl bg-[#2c2d33] shadow-xl border-b-[3px] border-[#2c2d33] flex-shrink-0 cursor-default w-fit">
-              <span className="text-2xl transition-transform duration-200">🐝</span>
-              <span className="text-xl font-bold text-[#b08b3e] tracking-tight uppercase">Buzzer Hub</span>
+              <img src="/buzzer_bee_minimalist.png" alt="Buzzer Bee" className="w-8 h-8 object-contain transition-transform duration-200" />
+              <span className="text-xl font-bold text-[#EAAA40] tracking-tight uppercase">Buzzer Hub</span>
             </div>
         </div>
 

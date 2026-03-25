@@ -264,7 +264,7 @@ export default function Chat() {
         <div className="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar bg-transparent">
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full opacity-40 text-center animate-fade-in">
-              <span className="text-6xl mb-4">🐝</span>
+              <img src="/buzzer_hive_minimalist.png" alt="Buzzer Hive" className="w-24 h-24 object-contain mb-4" />
               <p className="text-sm font-bold uppercase tracking-[0.1em] text-gray-400">Pronto para analisar dados.</p>
               <p className="text-xs text-gray-600 max-w-sm mt-2">Envie suas dúvidas sobre manejo, florada ou laudos apícolas.</p>
             </div>
@@ -274,8 +274,8 @@ export default function Chat() {
             {messages.map((msg) => (
               <div key={msg.id} className={`flex gap-3 animate-slide-up ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {msg.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-full bg-[#2A2B30] border border-gray-700 flex items-center justify-center text-sm flex-shrink-0">
-                    🐝
+                  <div className="w-8 h-8 rounded-full bg-[#2A2B30] border border-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <img src="/buzzer_bee_minimalist.png" alt="Buzzer AI" className="w-5 h-5 object-contain" />
                   </div>
                 )}
                 <div className={`max-w-[75%] p-4 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${

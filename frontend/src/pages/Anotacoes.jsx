@@ -187,8 +187,7 @@ export default function Anotacoes() {
           /* EMPTY STATE */
           <div className="flex-1 flex flex-col items-center justify-center bg-[#1E1F22] p-20">
             <div className="relative mb-10">
-                <span className="text-[120px] opacity-10">📂</span>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl">🐝</span>
+                <img src="/buzzer_folder_dripping.png" alt="Buzzer Folder" className="w-64 h-64 object-contain opacity-10 animate-drip" />     
             </div>
             <h2 className="text-3xl font-black text-white mb-3 tracking-tighter">NENHUMA NOTA ENCONTRADA</h2>
             <p className="text-gray-400 mb-10 text-center max-w-sm uppercase text-[11px] font-bold tracking-[0.1em] leading-loose">
